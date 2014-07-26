@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>View Profile</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" media="screen" href="http://localhost/forum/css/bootstrap.css">
+    <
+
+</head>
+<body>
+
+<div class="container">
+
+    <div class="row">
+
+        <legend><img src="http://localhost/forum/img/profile.jpg"></legend>
+        <br/>
+        <div class="span8">
+
+            <i>Просмотр профиля</i>
+            <hr>
+            <br/>
+
+            <form class="form-horizontal" id="myForm">
+                <fieldset>
+                    <div class="control-group">
+
+                        <label class="control-label" for="">Photo</label>
+                        <div class="controls">
+                            <span><img src="http://localhost/forum/images/{{PHOTO}}" alt="Фото"></span>
+                        </div>
+                    </div>
+                    <div class="control-group">
+
+                        <label class="control-label" for="">UserName</label>
+                        <div class="controls">
+                            <span class="input-xlarge uneditable-input"><i>{{USERNAME}}</i></span>
+                        </div>
+                    </div>
+                    <div class="control-group">
+
+                        <label class="control-label" for="">Last Name</label>
+                        <div class="controls">
+                            <span class="input-xlarge uneditable-input">{{LASTNAME}}</span>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="">First Name</label>
+                        <div class="controls">
+                            <span class="input-xlarge uneditable-input">{{FIRSTNAME}}</span>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="">Gender</label>
+                        <div class="controls">
+                            <span class="input-xlarge uneditable-input">{{GENDER}}</span>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label" for="">Date of Birth</label>
+                        <div class="controls">
+                            <span class="input-xlarge uneditable-input">{{DATE_BIRTH}}</span>
+                        </div>
+                    </div>
+
+                </fieldset>
+            </form>
+
+
+
+
+
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

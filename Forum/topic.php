@@ -1,10 +1,9 @@
 <?php
 include('inc/crtForm.php');
 include('inc/validateForm.php');
-include('pagClass.php');
-include('getListClass.php');
-session_start();
-$_SESSION['id_user']=3;
+include('inc/pagClass.php');
+include('inc/getListClass.php');
+
 $html="<div class='topic'>";
 $getlist=new getList();
 $list=$getlist->getTopicsList();

@@ -1,0 +1,72 @@
+<head>
+<title>Registration</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" media="screen" href="../css/bootstrap.css">
+<link rel="stylesheet" type="text/css" href="css/stylepost.css" />
+
+</head>
+<body>
+
+<div class="container">
+
+    <div class="row">
+
+        <legend><img src="../img/registration.jpg"></legend>
+        <br/>
+        <div class="span8">
+
+            <i>Введите пожалуйства ваши имя и пароль для создания учетной записи</i>
+            <hr>
+            <br/>
+
+            <form class="form-horizontal" enctype="multipart/form-data" action="../registration.php" method="post" id="myForm">
+                <fieldset>
+
+                    <div class="control-group">
+
+
+                        <div class="controls">
+                            <input class="span8" type="text" name="username" value="" placeholder="Name" />
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <div class="controls">
+                            <input class="span8" type="password" name="password" value="" placeholder="Password" />
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <div class="controls">
+                            <input class="span8" type="password" name="repassword" placeholder="Repassword"/>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+
+                        <div class="controls">
+                            <img src="../inc/captcha.php" title="Enter passphrase"/>
+                            <input type="text" name="captcha" id="captcha" autocomplete="off" value=""/>
+
+                        </div>
+                    </div>
+                    <div class="control-group" style="color: red; background: #ffff00" align="center">
+                        <? echo $_SESSION['name_error']; echo $_SESSION['captcha_error'];?>
+                    </div>
+                    <div class="controls">
+                        <button id="resetBtn" name="resetBtn" type="reset" class="btn btn-success">Clear</button>
+                        <input class="btn btn-primary" type="submit" id="submit" name="submit" value="Enter">
+                    </div>
+                </fieldset>
+            </form>
+
+
+
+
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>

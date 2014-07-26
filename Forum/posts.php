@@ -1,7 +1,7 @@
 <?php
 include('inc/crtForm.php');
-include('getListClass.php');
-include('pagClass.php');
+include('inc/getListClass.php');
+include('inc/pagClass.php');
 include('inc/validateForm.php');
 session_start();
 if(isset($_GET['id'])){

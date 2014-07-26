@@ -1,0 +1,53 @@
+<?php session_start();?>
+<head>
+    <title>Authorization</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" media="screen" href="../css/bootstrap.css">
+
+
+</head>
+<body>
+
+<div class="container">
+
+    <div class="row">
+
+        <legend><img src="../img/login1.jpg"></legend>
+        <br/>
+        <div class="span8">
+
+            <i>Введите пожалуйства ваши имя и пароль для входа</i>
+            <hr>
+            <br/>
+
+            <form class="form-horizontal" enctype="multipart/form-data" action="../login.php" method="post" id="myForm">
+                <fieldset>
+
+                    <div class="control-group">
+
+
+                        <div class="controls">
+                            <input class="span8" type="text" name="username" value="" placeholder="Name" />
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <div class="controls">
+                            <input class="span8" type="password" name="password" value="" placeholder="Password" />
+                        </div>
+                    </div>
+                    <div class="control-group" style="color: red; background: #ffff00" align="center">
+                        <? echo $_SESSION['name_error']; echo $_SESSION['password_error']; echo $_SESSION['error_msg'];?>
+                    </div>
+                    <div class="controls">
+                        <button id="resetBtn" name="resetBtn" type="reset" class="btn btn-success">Clear</button>
+                        <input class="btn btn-primary" type="submit" id="submit" name="submit" value="Enter">
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+</div>
+
+</div>
+</div>
+</body>
