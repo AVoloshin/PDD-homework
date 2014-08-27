@@ -1,0 +1,28 @@
+<?php
+class MyExchangeModel extends Model{
+
+    public function __construct($fileName){
+        if(file_exists($fileName)){
+            $zip=new ZipArchive;
+            if(($zip->open($fileName))===true){
+                $zip->extractTo(DIR_DOWNLOAD);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public function readToXml(){
+        $fileName=DIR_DOWNLOAD.'webdata/import.xml';
+        $xmlStr=file_get_contents($fileName);
+        $xml=new SimpleXMLElement($xmlStr);
+
+        return $xml;
+    }
+
+    private function selectObject(){
+        
+    }
+
+
+}
