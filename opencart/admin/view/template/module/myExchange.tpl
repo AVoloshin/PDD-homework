@@ -24,9 +24,7 @@
                 <?php echo $entry_upload; ?>
                         <input type=file name=uploadfile>
                         <input type=submit value=Загрузить>
-
             </form>
-            <?php echo $vdump; ?>
         </div>
     </div>
 
