@@ -8,14 +8,15 @@ class ControllerModuleMyExchange extends Controller {
         /*$this->load->model('setting/setting');*/
 
         if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validate()){
-        if(move_uploaded_file($_FILES['uploadfile']['tmp_name'], DIR_DOWNLOAD.$_FILES['uploadfile']['name'])) {
+            if(move_uploaded_file($_FILES['uploadfile']['tmp_name'], DIR_CACHE.$_FILES['uploadfile']['name'])) {
+                $file=DIR_CACHE.$_FILES['uploadfile']['name'];
             /*$this->model_setting_setting->editSetting('myExchange', $this->request->post);*/
-
-            $this->session->data['success'] = $this->language->get('text_success');
-            $this->redirect($this->url->link('extension/module', 'token=' . $this->session->data['token'], 'SSL'));
-
-
-        }
+                $this->load->model('tool/myExchange');
+                $this->load->model_tool_myExchange->unZip($file);
+                $xml=$this->load->model_tool_myExchange->readToXml();
+                $this->session->data['success'] = $this->language->get('text_success');
+                $this->redirect($this->url->link('extension/module', 'token=' . $this->session->data['token'], 'SSL'));
+            }
         }
 
         $this->data['heading_title'] = $this->language->get('heading_title');
@@ -63,6 +64,7 @@ class ControllerModuleMyExchange extends Controller {
         } elseif ($this->config->get('myExchange_module')) {
             $this->data['modules'] = $this->config->get('myExchange_module');
         }
+
         $this->load->model('design/layout');
 
         $this->data['layouts'] = $this->model_design_layout->getLayouts();
