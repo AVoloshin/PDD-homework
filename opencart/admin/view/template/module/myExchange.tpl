@@ -9,7 +9,7 @@
     <div class="warning"><?php echo $error_warning; ?></div>
     <?php } ?>
     <?php
-    var_dump(isset($text_success));
+    //var_dump($this->goods);
     if (isset ($text_success)) { ?>
     <div class="warning"><?php echo $text_success; ?></div>
     <?php } ?>
@@ -22,8 +22,8 @@
         <div class="content">
             <form action="<?php echo $action; ?>" method="post" enctype="multipart/form-data" id="form">
                 <?php echo $entry_upload; ?>
-                        <input type=file name=uploadfile>
-                        <input type=submit value=Загрузить>
+                        <input type="file" name="uploadfile" accept=".rar" required>
+                        <input type="submit" value="Загрузить">
             </form>
         </div>
     </div>

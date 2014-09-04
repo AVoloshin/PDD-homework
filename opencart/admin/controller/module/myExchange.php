@@ -5,17 +5,20 @@ class ControllerModuleMyExchange extends Controller {
     public function index() {
         $this->load->language('module/myExchange');
         $this->document->setTitle($this->language->get('heading_title'));
-        /*$this->load->model('setting/setting');*/
+        $this->load->model('setting/setting');
 
         if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validate()){
             if(move_uploaded_file($_FILES['uploadfile']['tmp_name'], DIR_CACHE.$_FILES['uploadfile']['name'])) {
                 $file=DIR_CACHE.$_FILES['uploadfile']['name'];
-            /*$this->model_setting_setting->editSetting('myExchange', $this->request->post);*/
+                $this->model_setting_setting->editSetting('myExchange', $this->request->post);
                 $this->load->model('tool/myExchange');
                 $this->load->model_tool_myExchange->unZip($file);
-                $xml=$this->load->model_tool_myExchange->readToXml();
+                $this->goods=$this->load->model_tool_myExchange->setGoodInfo();
+                $this->db=$this->load->model_tool_myExchange->PDO_connect('opencart','localhost','root','7233992');
+                $this->ds=$this->load->model_tool_myExchange->importToDb($this->db, $this->goods);
+
                 $this->session->data['success'] = $this->language->get('text_success');
-                $this->redirect($this->url->link('extension/module', 'token=' . $this->session->data['token'], 'SSL'));
+                //$this->redirect($this->url->link('extension/module', 'token=' . $this->session->data['token'], 'SSL'));
             }
         }
 
@@ -24,6 +27,7 @@ class ControllerModuleMyExchange extends Controller {
         $this->data['entry_upload'] = $this->language->get('entry_upload');
 
         $this->data['button_save'] = $this->language->get('button_save');
+
         $this->data['button_cancel'] = $this->language->get('button_cancel');
 
         if (isset($this->error['warning'])) {
@@ -32,25 +36,7 @@ class ControllerModuleMyExchange extends Controller {
             $this->data['error_warning'] = '';
         }
 
-        $this->data['breadcrumbs'] = array();
-
-        $this->data['breadcrumbs'][] = array(
-            'text'      => $this->language->get('text_home'),
-            'href'      => $this->url->link('common/home', 'token=' . $this->session->data['token'], 'SSL'),
-            'separator' => false
-        );
-
-        $this->data['breadcrumbs'][] = array(
-            'text'      => $this->language->get('text_module'),
-            'href'      => $this->url->link('extension/module', 'token=' . $this->session->data['token'], 'SSL'),
-            'separator' => ' :: '
-        );
-
-        $this->data['breadcrumbs'][] = array(
-            'text'      => $this->language->get('heading_title'),
-            'href'      => $this->url->link('module/myExchange', 'token=' . $this->session->data['token'], 'SSL'),
-            'separator' => ' :: '
-        );
+        $this->breadcrumbs();
 
         $this->data['action'] = $this->url->link('module/myExchange', 'token=' . $this->session->data['token'], 'SSL');
 
@@ -86,6 +72,28 @@ class ControllerModuleMyExchange extends Controller {
         } else {
             return false;
         }
+    }
+
+    private function breadcrumbs(){
+        $this->data['breadcrumbs'] = array();
+
+        $this->data['breadcrumbs'][] = array(
+            'text'      => $this->language->get('text_home'),
+            'href'      => $this->url->link('common/home', 'token=' . $this->session->data['token'], 'SSL'),
+            'separator' => false
+        );
+
+        $this->data['breadcrumbs'][] = array(
+            'text'      => $this->language->get('text_module'),
+            'href'      => $this->url->link('extension/module', 'token=' . $this->session->data['token'], 'SSL'),
+            'separator' => ' :: '
+        );
+
+        $this->data['breadcrumbs'][] = array(
+            'text'      => $this->language->get('heading_title'),
+            'href'      => $this->url->link('module/myExchange', 'token=' . $this->session->data['token'], 'SSL'),
+            'separator' => ' :: '
+        );
     }
 }
 ?>
