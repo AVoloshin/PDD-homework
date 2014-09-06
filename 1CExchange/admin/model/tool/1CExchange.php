@@ -1,5 +1,5 @@
 <?php
-class ModelToolMyExchange extends Model{
+class ModelTool1CExchange extends Model{
 
     public function unRar($fileName){
         if(file_exists($fileName)){
@@ -7,14 +7,12 @@ class ModelToolMyExchange extends Model{
             $rar=rar_open($fileName);
             if($rar===false){
                 return false;
-                echo 'Не удалось открыть архив';
-            }
+                            }
             $entries=rar_list($rar);
 
             if($entries===false){
                 return false;
-                echo 'Файл в архиве не найден';
-            }
+                            }
             foreach($entries as $entry){
                 $entry->extract(DIR_CACHE);
             }
@@ -24,11 +22,17 @@ class ModelToolMyExchange extends Model{
         }
         return false;
     }
+
+    /**
+     * Распаковывает загруженный файл
+     * @param $filename путь файла
+     * @return string сообщение об ошибке при неудаче
+     */
     public function unZip($filename){
         $zip=new ZipArchive();
         $res=$zip->open($filename);
         if($res===TRUE){
-            $zip->extractTo(DIR_CACHE);
+            $zip->extractTo(DIR_IMAGE);
             $zip->close();
         }
         else {
@@ -37,8 +41,13 @@ class ModelToolMyExchange extends Model{
         }
     }
 
+    /**
+     * Читает xml файл в строку.
+     * @param $file
+     * @return string
+     */
     public function readToXML($file){
-        $fileName=DIR_CACHE.'webdata/'.$file.'.xml';
+        $fileName=DIR_IMAGE.'webdata/'.$file.'.xml';
         $xmlStr=file_get_contents($fileName);
         return $xmlStr;
     }
@@ -48,6 +57,11 @@ class ModelToolMyExchange extends Model{
         return $xml;
     }
 
+    /**
+     * Выбирает данные о товарах.
+     * @param $xml
+     * @return array
+     */
     public function selectGoods($xml){
         $arrayGoods=array();
         $goods=$xml->xpath('Каталог/Товары/Товар');
@@ -56,10 +70,15 @@ class ModelToolMyExchange extends Model{
 
             if(count($good->{'Картинка'})>1){
                 foreach($good->{'Картинка'} as $img){
-                    $images[]= DIR_CACHE.'webdata/'.(string) $img;
+                    $images[]= 'webdata/'.(string) $img;
                 }
             }
-            else $images= DIR_CACHE.'webdata/'.(string) $good->{'Картинка'};
+            elseif (count($good->{'Картинка'})==0) {
+                $images='';
+            }
+            else {
+                $images= 'webdata/'.(string) $good->{'Картинка'};
+            }
 
             foreach($good->{'ЗначенияРеквизитов'}->{'ЗначениеРеквизита'} as $value){
                 if((string) $value->{'Наименование'}==='ВидНоменклатуры'){
@@ -81,6 +100,11 @@ class ModelToolMyExchange extends Model{
         return $arrayGoods;
     }
 
+    /**
+     * Выбирает данные о категориях
+     * @param $xml
+     * @return array
+     */
     public function selectCategories($xml){
         $arrayCategories=array();
         $cats=$xml->xpath('Классификатор/Группы/Группа');
@@ -95,6 +119,12 @@ class ModelToolMyExchange extends Model{
         return $arrayCategories;
     }
 
+    /**
+     * Выбирает цену и количество товаров
+     * @param $xml
+     * @return array
+     *
+     */
     public function selectPrices($xml){
         $arrayGoods=array();
         $goods=$xml->xpath('ПакетПредложений/Предложения/Предложение');
@@ -115,6 +145,7 @@ class ModelToolMyExchange extends Model{
     }
 
     /**
+     * Собирает методы работы с xml.
      * @param $file - имя файла для парсинга ('import' или 'offers')
      * @return array - архив с данными о товаре
      */
@@ -130,6 +161,11 @@ class ModelToolMyExchange extends Model{
         return $array;
     }
 
+    /**
+     * Собирает данные о товарах в 1 архив
+     * @return array
+     *
+     */
     public function getAllData(){
         $goods=array();
         $import=$this->processXML('import');
@@ -146,6 +182,12 @@ class ModelToolMyExchange extends Model{
         return $goods;
     }
 
+    /**
+     * Подготавливает данные о товарах для импорта в БД
+     * @param $goods
+     * @return array
+     *
+     */
     public function productData($goods){
 
         unset ($goods['categories']);
@@ -169,7 +211,7 @@ class ModelToolMyExchange extends Model{
                 'price'=>$good['price'],
                 'tax_class_id'=>7,
                 'date_available'=>date("Y-m-d H:i:s"),
-                'status'=>'',
+                'status'=>1,
                 'product_description'=>$good['desc'],
                 'store_id'=>0,
                 'product_category'=>$good['category_name']
@@ -178,6 +220,7 @@ class ModelToolMyExchange extends Model{
                 $data['image']=$good['img'];
             }
             else {
+                $data['image']=$good['img'][0];
                 $images=array_slice($good['img'],1);
                 $data['product_image']=$images;
             }
@@ -186,6 +229,12 @@ class ModelToolMyExchange extends Model{
         return $allGoods;
     }
 
+    /**
+     * Подготавливает данные о категориях для импорта в БД
+     * @param $arrayCategories
+     * @return array
+     *
+     */
     public function categoryData($arrayCategories){
         $allCats=array();
 
@@ -203,6 +252,11 @@ class ModelToolMyExchange extends Model{
         }
         return $allCats;
     }
+
+    /**
+     * Добавляет товар в таблицы БД
+     * @param $data
+     */
 
     public function addProduct($data) {
         $this->db->query("INSERT INTO " . DB_PREFIX . "product SET model = '" . $this->db->escape($data['model']) . "', sku = '" . $this->db->escape($data['sku']) . "', upc = '" . $this->db->escape($data['upc']) . "', ean = '" . $this->db->escape($data['ean']) . "', jan = '" . $this->db->escape($data['jan']) . "', isbn = '" . $this->db->escape($data['isbn']) . "', mpn = '" . $this->db->escape($data['mpn']) . "', location = '" . $this->db->escape($data['location']) . "', quantity = '" . (int)$data['quantity'] . "', stock_status_id = '" . (int)$data['stock_status_id'] . "', date_available = '" . $this->db->escape($data['date_available']) . "', manufacturer_id = '" . (int)$data['manufacturer_id'] . "', price = '" . (float)$data['price'] . "', status = '" . (int)$data['status'] . "', tax_class_id = '" . $this->db->escape($data['tax_class_id']) . "', date_added = NOW()");
@@ -231,6 +285,10 @@ class ModelToolMyExchange extends Model{
         $this->cache->delete('product');
     }
 
+    /**
+     * Добавляет категории в БД
+     * @param $data
+     */
     public function addCategory($data) {
         $this->db->query("INSERT INTO " . DB_PREFIX . "category SET `top` = '" . (isset($data['top']) ? (int)$data['top'] : 1) . "', `column` = '" . (int)$data['column'] . "', status = '" . (int)$data['status'] . "', date_modified = NOW(), date_added = NOW()");
 
@@ -261,6 +319,9 @@ class ModelToolMyExchange extends Model{
 
     }
 
+    /**
+     * Очищает данные о товарах и категориях из БД
+     */
     public function clearDb(){
         $this->db->query("DELETE t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15 FROM " . DB_PREFIX . "product t1
             LEFT JOIN " . DB_PREFIX . "product_attribute t2 ON(t1.product_id=t2.product_id)
@@ -286,4 +347,73 @@ class ModelToolMyExchange extends Model{
         //WHERE  t1.`category_id`=58
     }
 
+    /**
+     * Обновляет данные о товаре в БД
+     * @param $data
+     */
+    public function updateProduct($data) {
+
+        $this->db->query("UPDATE " . DB_PREFIX . "product SET sku = '" . $this->db->escape($data['sku']) . "', upc = '" . $this->db->escape($data['upc']) . "', ean = '" . $this->db->escape($data['ean']) . "', jan = '" . $this->db->escape($data['jan']) . "', isbn = '" . $this->db->escape($data['isbn']) . "', mpn = '" . $this->db->escape($data['mpn']) . "', location = '" . $this->db->escape($data['location']) . "', quantity = '" . (int)$data['quantity'] . "', stock_status_id = '" . (int)$data['stock_status_id'] . "', date_available = '" . $this->db->escape($data['date_available']) . "', manufacturer_id = '" . (int)$data['manufacturer_id'] . "', price = '" . (float)$data['price'] . "', status = '" . (int)$data['status'] . "', tax_class_id = '" . $this->db->escape($data['tax_class_id']) . "', date_modified = NOW() WHERE model='".$data['model']."'");
+
+        $language_id = 1;
+
+        if (isset($data['image'])) {
+            $this->db->query("UPDATE " . DB_PREFIX . "product SET image = '" . $this->db->escape(html_entity_decode($data['image'], ENT_QUOTES, 'UTF-8')) . "' WHERE model='".$data['model']."'");
+        }
+
+        $this->db->query("UPDATE " . DB_PREFIX . "product_description SET language_id = '" . (int)$language_id . "', name = '" . $this->db->escape($data['name']) . "', meta_keyword = '', meta_description = '', description = '" . $this->db->escape($data['product_description']) . "', tag = '', seo_title = '', seo_h1 = '' WHERE product_id = (SELECT product_id FROM ".DB_PREFIX."product WHERE model='".$data['model']."')");
+
+        $this->db->query("UPDATE " . DB_PREFIX . "product_to_store SET store_id = '" . (int)$data['store_id'] . "' WHERE product_id = (SELECT product_id FROM ".DB_PREFIX."product WHERE model='".$data['model']."')");
+
+        if (isset($data['product_image'])) {
+            $sort_order=0;
+            foreach ($data['product_image'] as $product_image) {
+                $this->db->query("UPDATE " . DB_PREFIX . "product_image SET image = '" . $this->db->escape(html_entity_decode($product_image, ENT_QUOTES, 'UTF-8')) . "', sort_order = '" . (int)$sort_order . "' WHERE product_id = (SELECT product_id FROM ".DB_PREFIX."product WHERE model='".$data['model']."')");
+                $sort_order++;
+            }
+        }
+
+        $this->db->query("UPDATE " . DB_PREFIX . "product_to_category SET category_id = (SELECT t1.category_id FROM " . DB_PREFIX . "category t1 LEFT JOIN " . DB_PREFIX . "category_description t2 ON (t1.category_id=t2.category_id) WHERE t2.`name`='".$data['product_category']."') WHERE product_id =(SELECT product_id FROM ".DB_PREFIX."product WHERE model='".$data['model']."')");
+
+        $this->cache->delete('product');
+    }
+
+    /**
+     * Обновляет данные о категории в БД
+     * @param $data
+     */
+    public function updateCategory($data) {
+        $this->db->query("UPDATE " . DB_PREFIX . "category SET `top` = '" . (isset($data['top']) ? (int)$data['top'] : 1) . "', `column` = '" . (int)$data['column'] . "', status = '" . (int)$data['status'] . "', parent_id = '" . (int)$data['parent_id'] . "', date_modified = NOW() WHERE category_id = (SELECT category_id FROM oc_category_description WHERE `name` = '".$data['category']."')");
+
+        if (isset($data['image'])) {
+            $this->db->query("UPDATE " . DB_PREFIX . "category SET image = '" . $this->db->escape(html_entity_decode($data['image'], ENT_QUOTES, 'UTF-8')) . "' WHERE category_id = (SELECT category_id FROM oc_category_description WHERE `name` = '".$data['category']."')");
+        }
+
+        $language_id = 1;
+
+        $this->db->query("UPDATE `" . DB_PREFIX . "category_description` SET `language_id` = '" . (int)$language_id . "', `meta_keyword` = '', `meta_description` = '', `description` = '', `seo_title` = '', `seo_h1` = '' WHERE `name` = '" . $data['category'] . "'");
+
+    }
+
+    public function selectProduct($data){
+        $query=$this->db->query("SELECT product_id FROM oc_product WHERE model='".$data['model']."'");
+        $res=count($query->rows);
+        if($res==0){
+            return false;
+        }
+        else {
+        return true;
+        }
+    }
+
+    public function selectCategory($data){
+        $query=$this->db->query("SELECT category_id FROM oc_category_description WHERE `name` = '".$data['category']."'");
+        $res=count($query->rows);
+        if($res==0){
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
 }
