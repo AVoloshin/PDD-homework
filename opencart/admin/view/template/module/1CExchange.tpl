@@ -9,9 +9,12 @@
     <div class="warning"><?php echo $error_warning; ?></div>
     <?php } ?>
     <?php
-    //var_dump($this->goods);
-    if (isset ($text_success)) { ?>
-    <div class="warning"><?php echo $text_success; ?></div>
+    var_dump($this->goods);
+    var_dump($this->ad);
+    var_dump($_POST);
+
+    if (isset ($zip_error)) { ?>
+    <div class="warning"><?php echo $zip_error; ?></div>
     <?php } ?>
 
     <div class="box">
@@ -23,8 +26,13 @@
             <form action="<?php echo $action; ?>" method="post" enctype="multipart/form-data" id="form">
                 <?php echo $entry_upload; ?>
                         <input type="file" name="uploadfile" accept=".rar" required>
+                <?php echo $entry_checkbox; ?>
+                        <input type="checkbox" name="cleardb" value="Очистить БД">
                         <input type="submit" value="Загрузить">
             </form>
+            <?php if(isset($text_complete)) { ?>
+            <div class="success"><?php echo $text_complete; ?></div>
+            <?php }?>
         </div>
     </div>
 
